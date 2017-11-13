@@ -112,6 +112,10 @@ char *nlabel_to_str(const uint8_t *name) {
 		p += label_len;
 	}
 
+	// avoid writing NULL past end of buffer
+	if (buf_len == 0)
+		labelp--;
+
 	*labelp = '\0';
 
 	return label;
