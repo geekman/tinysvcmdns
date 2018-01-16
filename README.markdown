@@ -1,3 +1,14 @@
+NOTICE
+=======
+
+This project is un-maintained, and has been since 2013.
+
+There are known vulnerabilities that have been disclosed, and quite possibly 
+others that have yet to be disclosed. Refer to the issue tracker.
+
+You are advised to NOT use this library for any new projects / products.
+
+
 tinysvcmdns
 ============
 tinysvcmdns is a tiny MDNS responder implementation for publishing services.
