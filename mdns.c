@@ -55,6 +55,9 @@ struct name_comp {
 
 // duplicates a name
 inline uint8_t *dup_nlabel(const uint8_t *n) {
+	if (n == NULL)
+		return NULL;
+
 	assert(n[0] <= 63);	// prevent mis-use
 	return (uint8_t *) strdup((char *) n);
 }
@@ -92,7 +95,8 @@ char *nlabel_to_str(const uint8_t *name) {
 	const uint8_t *p;
 	size_t buf_len = 256;
 
-	assert(name != NULL);
+	if (name == NULL)
+		return NULL;
 
 	label = labelp = malloc(buf_len);
 
@@ -149,7 +153,9 @@ uint8_t *create_label(const char *txt) {
 	int len;
 	uint8_t *s;
 
-	assert(txt != NULL);
+	if (txt == NULL)
+		return NULL;
+
 	len = strlen(txt);
 	if (len > 63)
 		return NULL;
@@ -598,9 +604,15 @@ static size_t mdns_parse_qn(uint8_t *pkt_buf, size_t pkt_len, size_t off,
 	assert(pkt != NULL);
 
 	rr = malloc(sizeof(struct rr_entry)); 
+	if (rr == NULL)
+		goto err;
+
 	memset(rr, 0, sizeof(struct rr_entry));
 
 	name = uncompress_nlabel(pkt_buf, pkt_len, off);
+	if (name == NULL) 
+		goto err;
+
 	p += label_len(pkt_buf, pkt_len, off);
 	rr->name = name;
 
@@ -614,6 +626,10 @@ static size_t mdns_parse_qn(uint8_t *pkt_buf, size_t pkt_len, size_t off,
 	rr_list_append(&pkt->rr_qn, rr);
 	
 	return p - (pkt_buf + off);
+
+err:
+	free(rr);
+	return 0;
 }
 
 // parse the MDNS RR section
@@ -634,9 +650,15 @@ static size_t mdns_parse_rr(uint8_t *pkt_buf, size_t pkt_len, size_t off,
 		return 0;
 
 	rr = malloc(sizeof(struct rr_entry)); 
+	if (rr == NULL)
+		goto err;
+
 	memset(rr, 0, sizeof(struct rr_entry));
 
 	name = uncompress_nlabel(pkt_buf, pkt_len, off);
+	if (name == NULL)
+		goto err;
+
 	p += label_len(pkt_buf, pkt_len, off);
 	rr->name = name;
 
@@ -739,6 +761,10 @@ static size_t mdns_parse_rr(uint8_t *pkt_buf, size_t pkt_len, size_t off,
 	rr_list_append(&pkt->rr_ans, rr);
 	
 	return p - (pkt_buf + off);
+
+err:
+	free(rr);
+	return 0;
 }
 
 // parse a MDNS packet into an mdns_pkt struct
